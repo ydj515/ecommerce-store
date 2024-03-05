@@ -1,0 +1,13 @@
+### test first service message
+GET {{host}}/first-service/message
+first-request: my-first-header
+
+### test second service message
+GET {{host}}/second-service/message
+second-request: my-second-header
+
+### test customFilter 1
+GET {{host}}/first-service/check
+
+### test customFilter 2
+GET {{host}}/second-service/check
