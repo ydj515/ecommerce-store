@@ -2,6 +2,7 @@ package org.example.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.orderservice.model.dto.OrderDto;
 import org.example.orderservice.model.entity.Order;
 import org.example.orderservice.model.mapper.ModelMapper;
 import org.example.orderservice.model.payload.request.OrderRequest;
@@ -20,8 +21,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
 
     @Override
-    public OrderResponse createOrder(OrderRequest orderRequest) {
-        Order order = ModelMapper.INSTANCE.toOrder(orderRequest);
+    public OrderResponse createOrder(OrderDto orderDto) {
+        Order order = ModelMapper.INSTANCE.toOrder(orderDto);
         Order savedOrder = orderRepository.save(order);
         return ModelMapper.INSTANCE.toOrderResponse(savedOrder);
     }

@@ -2,6 +2,8 @@ package org.example.orderservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.orderservice.model.dto.OrderDto;
+import org.example.orderservice.model.mapper.ModelMapper;
 import org.example.orderservice.model.payload.request.OrderRequest;
 import org.example.orderservice.model.payload.response.OrderResponse;
 import org.example.orderservice.service.OrderService;
@@ -9,6 +11,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/order-service")
@@ -28,10 +32,9 @@ public class OrderController {
     @PostMapping("/{userId}/orders")
     public ResponseEntity<?> createOrder(@PathVariable("userId") String userId,
                                          @RequestBody OrderRequest orderRequest) {
-        log.info("Before add orders data");
-
+        OrderDto orderDto = ModelMapper.INSTANCE.toOrderDto(userId, orderRequest);
         /* jpa */
-        OrderResponse createdOrder = orderService.createOrder(orderRequest);
+        OrderResponse createdOrder = orderService.createOrder(orderDto);
 
 
         /* kafka */
@@ -50,18 +53,7 @@ public class OrderController {
 
     @GetMapping("/{userId}/orders")
     public ResponseEntity<?> getOrder(@PathVariable("userId") String userId) throws Exception {
-        log.info("Before retrieve orders data");
         Iterable<OrderResponse> orders = orderService.getOrdersByUserId(userId);
-
-        try {
-            Thread.sleep(1000);
-            throw new Exception("장애 발생");
-        } catch (InterruptedException ex) {
-            log.warn(ex.getMessage());
-        }
-
-        log.info("Add retrieved orders data");
-
         return ResponseEntity.status(HttpStatus.OK).body(orders);
     }
 

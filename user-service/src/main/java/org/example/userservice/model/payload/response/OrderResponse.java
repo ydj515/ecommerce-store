@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class OrderResponse {
-    private Long productId;
-    private long quantity;
-    private Long unitPrice;
-    private Long totalPrice;
+    private String productId;
+    private Integer quantity;
+    private Integer unitPrice;
+    private Integer totalPrice;
     private LocalDateTime createdAt;
 
-    private Long orderId;
+    private String orderId;
 }

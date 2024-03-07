@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderResponse {
     private String productId;
-    private Integer qty;
+    private Integer quantity;
     private Integer unitPrice;
     private Integer totalPrice;
     private LocalDateTime createdAt;

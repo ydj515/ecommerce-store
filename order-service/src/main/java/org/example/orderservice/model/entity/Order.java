@@ -21,7 +21,7 @@ public class Order implements Serializable {
     @Column(nullable = false, length = 120, unique = true)
     private String productId;
     @Column(nullable = false)
-    private Integer qty;
+    private Integer quantity;
     @Column(nullable = false)
     private Integer unitPrice;
     @Column(nullable = false)

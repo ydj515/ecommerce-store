@@ -9,6 +9,6 @@ import lombok.Setter;
 @Builder
 public class OrderRequest {
     private String productId;
-    private Integer qty;
+    private Integer quantity;
     private Integer unitPrice;
 }

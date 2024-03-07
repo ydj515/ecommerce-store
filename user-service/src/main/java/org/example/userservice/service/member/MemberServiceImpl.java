@@ -2,11 +2,13 @@ package org.example.userservice.service.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.userservice.client.OrderServiceClient;
 import org.example.userservice.model.entity.Member;
 import org.example.userservice.model.mapper.ModelMapper;
 import org.example.userservice.model.payload.request.MemberRequest;
-import org.example.userservice.model.payload.response.SignUpResponse;
 import org.example.userservice.model.payload.response.MemberResponse;
+import org.example.userservice.model.payload.response.OrderResponse;
+import org.example.userservice.model.payload.response.SignUpResponse;
 import org.example.userservice.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService {
 
     private final UserRepository userRepository;
+    private final OrderServiceClient orderServiceClient;
 
     @Override
     @Transactional
@@ -40,14 +43,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberResponse getUserByUserId(String userId) {
-        Member member = userRepository.findByUserId(userId).orElseThrow(()->
+        Member member = userRepository.findByUserId(userId).orElseThrow(() ->
                 new UsernameNotFoundException(userId)
         );
+        List<OrderResponse> orders = orderServiceClient.getOrders(userId);
 
-        String orderUrl = "http://localhost:8000/order-service/%s/orders";
-
-
-        return ModelMapper.INSTANCE.toMemberResponse(member);
+        return ModelMapper.INSTANCE.toMemberResponseWithOrders(member, orders);
     }
 
     @Override
