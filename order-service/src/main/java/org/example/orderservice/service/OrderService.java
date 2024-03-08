@@ -1,8 +1,6 @@
 package org.example.orderservice.service;
 
 import org.example.orderservice.model.dto.OrderDto;
-import org.example.orderservice.model.entity.Order;
-import org.example.orderservice.model.payload.request.OrderRequest;
 import org.example.orderservice.model.payload.response.OrderResponse;
 
 public interface OrderService {

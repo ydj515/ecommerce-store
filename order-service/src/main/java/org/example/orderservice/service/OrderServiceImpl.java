@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.orderservice.model.dto.OrderDto;
 import org.example.orderservice.model.entity.Order;
 import org.example.orderservice.model.mapper.ModelMapper;
-import org.example.orderservice.model.payload.request.OrderRequest;
 import org.example.orderservice.model.payload.response.OrderResponse;
 import org.example.orderservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
