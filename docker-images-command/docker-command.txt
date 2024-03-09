@@ -1,0 +1,3 @@
+docker run -d  -p 3306:3306  --name mariadb -e MARIADB_ROOT_PASSWORD=root -e TZ=Asia/Seoul mariadb --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+docker run -d -p 15672:15672 -p 5672:5672 --name rabbitmq rabbitmq
