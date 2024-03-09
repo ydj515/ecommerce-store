@@ -40,7 +40,7 @@ public class UserRestController {
     public ResponseEntity<Api<Iterable<MemberResponse>>> getUsers() {
         return ResponseEntity.ok(
                 Api.<Iterable<MemberResponse>>builder()
-                        .resultCode(ResultCode.JOIN_SUCCESS)
+                        .resultCode(ResultCode.SUCCESS)
                         .data(memberService.getUsers())
                         .build()
         );
@@ -50,7 +50,7 @@ public class UserRestController {
     public ResponseEntity<Api<MemberResponse>> getUser(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(
                 Api.<MemberResponse>builder()
-                        .resultCode(ResultCode.JOIN_SUCCESS)
+                        .resultCode(ResultCode.SUCCESS)
                         .data(memberService.getUserByUserId(userId))
                         .build()
         );

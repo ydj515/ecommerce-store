@@ -3,7 +3,9 @@ package org.example.orderservice.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.orderservice.model.dto.OrderDto;
+import org.example.orderservice.model.enums.ResultCode;
 import org.example.orderservice.model.mapper.ModelMapper;
+import org.example.orderservice.model.payload.base.Api;
 import org.example.orderservice.model.payload.request.OrderRequest;
 import org.example.orderservice.model.payload.response.OrderResponse;
 import org.example.orderservice.service.OrderService;
@@ -28,31 +30,26 @@ public class OrderController {
     }
 
     @PostMapping("/{userId}/orders")
-    public ResponseEntity<?> createOrder(@PathVariable("userId") String userId,
-                                         @RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<Api<OrderResponse>> createOrder(@PathVariable("userId") String userId,
+                                                          @RequestBody OrderRequest orderRequest) {
         OrderDto orderDto = ModelMapper.INSTANCE.toOrderDto(userId, orderRequest);
-        /* jpa */
-        OrderResponse createdOrder = orderService.createOrder(orderDto);
 
-
-        /* kafka */
-//        orderDto.setOrderId(UUID.randomUUID().toString());
-//        orderDto.setTotalPrice(orderDetails.getQty() * orderDetails.getUnitPrice());
-
-        /* send this order to the kafka */
-//        kafkaProducer.send("example-catalog-topic", orderDto);
-//        orderProducer.send("orders", orderDto);
-
-//        ResponseOrder responseOrder = mapper.map(orderDto, ResponseOrder.class);
-
-        log.info("After added orders data");
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Api.<OrderResponse>builder()
+                        .resultCode(ResultCode.SUCCESS)
+                        .data(orderService.createOrder(orderDto))
+                        .build()
+                );
     }
 
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<?> getOrder(@PathVariable("userId") String userId) throws Exception {
-        Iterable<OrderResponse> orders = orderService.getOrdersByUserId(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(orders);
+    public ResponseEntity<Api<Iterable<OrderResponse>>> getOrder(@PathVariable("userId") String userId) throws Exception {
+        return ResponseEntity.ok(
+                Api.<Iterable<OrderResponse>>builder()
+                        .resultCode(ResultCode.SUCCESS)
+                        .data(orderService.getOrdersByUserId(userId))
+                        .build()
+        );
     }
 
 }

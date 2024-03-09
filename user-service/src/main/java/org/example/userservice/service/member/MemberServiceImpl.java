@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.userservice.client.OrderServiceClient;
 import org.example.userservice.model.entity.Member;
 import org.example.userservice.model.mapper.ModelMapper;
+import org.example.userservice.model.payload.base.Api;
 import org.example.userservice.model.payload.request.MemberRequest;
 import org.example.userservice.model.payload.response.MemberResponse;
 import org.example.userservice.model.payload.response.OrderResponse;
@@ -46,7 +47,8 @@ public class MemberServiceImpl implements MemberService {
         Member member = userRepository.findByUserId(userId).orElseThrow(() ->
                 new UsernameNotFoundException(userId)
         );
-        List<OrderResponse> orders = orderServiceClient.getOrders(userId);
+        Api<List<OrderResponse>> orderResponse = orderServiceClient.getOrders(userId);
+        List<OrderResponse> orders = orderResponse.getData();
 
         return ModelMapper.INSTANCE.toMemberResponseWithOrders(member, orders);
     }

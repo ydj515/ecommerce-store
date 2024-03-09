@@ -1,5 +1,6 @@
 package org.example.userservice.client;
 
+import org.example.userservice.model.payload.base.Api;
 import org.example.userservice.model.payload.response.OrderResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,5 +12,5 @@ import java.util.List;
 public interface OrderServiceClient {
 
     @GetMapping("/order-service/{userId}/orders")
-    List<OrderResponse> getOrders(@PathVariable String userId);
+    Api<List<OrderResponse>> getOrders(@PathVariable String userId);
 }

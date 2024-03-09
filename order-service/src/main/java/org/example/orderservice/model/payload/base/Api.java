@@ -1,7 +1,7 @@
-package org.example.userservice.model.payload.base;
+package org.example.orderservice.model.payload.base;
 
 import lombok.*;
-import org.example.userservice.model.enums.ResultCode;
+import org.example.orderservice.model.enums.ResultCode;
 
 import java.time.LocalDateTime;
 
