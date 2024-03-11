@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "catalog")
+@Table(name = "catalogs")
 public class Catalog implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
