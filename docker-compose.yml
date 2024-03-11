@@ -3,6 +3,14 @@ networks:
   kafka_network:
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.9.9-management
+    ports:
+      - "15672:15672" # web console port
+      - "5672:5672" # AMQP port
+    hostname: rabbitmq
+    container_name: rabbitmq
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     hostname: zookeeper
