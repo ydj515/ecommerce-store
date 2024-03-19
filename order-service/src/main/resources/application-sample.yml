@@ -43,9 +43,20 @@ management:
   info:
     env:
       enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: B3
+      produce: B3_MULTI
+  zipkin:
+    tracing:
+      endpoint: "http://localhost:9411/api/v2/spans"
 
 logging:
   level:
     org.hibernate:
       type.descriptor.sql: trace #show parameter binding
       SQL: DEBUG
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'

@@ -33,6 +33,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'

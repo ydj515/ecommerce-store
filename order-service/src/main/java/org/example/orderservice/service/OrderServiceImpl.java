@@ -43,7 +43,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Iterable<OrderResponse> getOrdersByUserId(String userId) {
+        log.info("before retrieve orders");
         List<Order> orders = orderRepository.findByUserId(userId);
+        log.info("after retrieve orders");
         return orders.stream().map(ModelMapper.INSTANCE::toOrderResponse)
                 .collect(Collectors.toList());
     }

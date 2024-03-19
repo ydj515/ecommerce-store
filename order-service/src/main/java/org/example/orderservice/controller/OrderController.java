@@ -43,7 +43,7 @@ public class OrderController {
     }
 
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<Api<Iterable<OrderResponse>>> getOrder(@PathVariable("userId") String userId) throws Exception {
+    public ResponseEntity<Api<Iterable<OrderResponse>>> getOrder(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(
                 Api.<Iterable<OrderResponse>>builder()
                         .resultCode(ResultCode.SUCCESS)

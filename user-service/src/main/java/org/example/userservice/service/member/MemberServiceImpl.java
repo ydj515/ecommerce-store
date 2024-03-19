@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.userservice.client.OrderServiceClient;
 import org.example.userservice.model.entity.Member;
+import org.example.userservice.model.enums.ResultCode;
 import org.example.userservice.model.mapper.ModelMapper;
 import org.example.userservice.model.payload.base.Api;
 import org.example.userservice.model.payload.request.MemberRequest;
@@ -11,10 +12,13 @@ import org.example.userservice.model.payload.response.MemberResponse;
 import org.example.userservice.model.payload.response.OrderResponse;
 import org.example.userservice.model.payload.response.SignUpResponse;
 import org.example.userservice.repository.UserRepository;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,9 +31,11 @@ public class MemberServiceImpl implements MemberService {
 
     private final UserRepository userRepository;
     private final OrderServiceClient orderServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     @Transactional
+
     public SignUpResponse createUser(MemberRequest memberRequest) {
         Optional<Member> findMember = userRepository.findByUserId(memberRequest.getEmail());
         if (findMember.isPresent()) {
@@ -47,7 +53,17 @@ public class MemberServiceImpl implements MemberService {
         Member member = userRepository.findByUserId(userId).orElseThrow(() ->
                 new UsernameNotFoundException(userId)
         );
-        Api<List<OrderResponse>> orderResponse = orderServiceClient.getOrders(userId);
+
+        log.info("before call orders");
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitBreaker");
+        Api<List<OrderResponse>> orderResponse = circuitBreaker.run(() -> orderServiceClient.getOrders(userId),
+                throwable -> Api.<List<OrderResponse>>builder()
+                        .resultCode(ResultCode.FAIL)
+                        .data(Collections.EMPTY_LIST)
+                        .build()
+        );
+        log.info("after call orders");
+
         List<OrderResponse> orders = orderResponse.getData();
 
         return ModelMapper.INSTANCE.toMemberResponseWithOrders(member, orders);
