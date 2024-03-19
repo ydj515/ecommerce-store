@@ -1,5 +1,6 @@
 package org.example.userservice.controller;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.example.userservice.model.enums.ResultCode;
 import org.example.userservice.model.payload.base.Api;
@@ -22,6 +23,7 @@ public class UserRestController {
     private final MemberService memberService;
 
     @GetMapping("/health-check")
+    @Timed(value="users.status", longTask = true)
     public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok(String.format("service on PORT %s", environment.getProperty("local.server.port")));
     }

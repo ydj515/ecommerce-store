@@ -2,6 +2,7 @@ HELP.md
 .gradle
 .DS_Store
 application.yml
+docker-data-files/grafana-data
 
 build/
 !gradle/wrapper/gradle-wrapper.jar
