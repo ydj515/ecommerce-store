@@ -73,7 +73,7 @@ services:
       - mariadb
       - kafka
     volumes:
-      - ./lib:/etc/kafka-connect/jars # https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc에서 다운 받고 lib/하위의 jar 파일들을 lib폴더하위로 복사
+      - ./docker-data-files/lib:/etc/kafka-connect/jars # https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc에서 다운 받고 lib/하위의 jar 파일들을 lib폴더하위로 복사
     networks:
       - kafka_network
     
@@ -105,6 +105,6 @@ services:
       --collation-server=utf8mb4_unicode_ci
       --init-file /docker-entrypoint-initdb.d/init.sql
     volumes:
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker-data-files/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - kafka_network

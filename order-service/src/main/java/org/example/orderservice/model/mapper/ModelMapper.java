@@ -16,6 +16,7 @@ public interface ModelMapper {
 
     OrderResponse toOrderResponse(Order order);
 
+    OrderResponse toOrderResponseByOrderDto(OrderDto orderDto);
 
     Order toOrder(OrderDto orderDto);
 
