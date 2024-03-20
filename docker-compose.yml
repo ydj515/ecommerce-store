@@ -1,15 +1,16 @@
 version: '2'
-networks:
-  kafka_network:
 
 services:
   rabbitmq:
     image: rabbitmq:3.9.9-management
+    hostname: rabbitmq
+    container_name: rabbitmq
     ports:
       - "15672:15672" # web console port
       - "5672:5672" # AMQP port
-    hostname: rabbitmq
-    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -21,7 +22,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - kafka_network
+      ecommerce-network:
+        ipv4_address: 172.18.0.100
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
@@ -45,7 +47,8 @@ services:
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
     networks:
-      - kafka_network
+      ecommerce-network:
+        ipv4_address: 172.18.0.101
 
   kafka-connect:
     image: confluentinc/cp-kafka-connect:7.0.1
@@ -75,7 +78,7 @@ services:
     volumes:
       - ./docker-data-files/lib:/etc/kafka-connect/jars # https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc에서 다운 받고 lib/하위의 jar 파일들을 lib폴더하위로 복사
     networks:
-      - kafka_network
+      - ecommerce-network
     
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -90,7 +93,7 @@ services:
       - kafka
       - zookeeper
     networks:
-      - kafka_network
+      - ecommerce-network
 
   mariadb:
     image: mariadb
@@ -107,13 +110,15 @@ services:
     volumes:
       - ./docker-data-files/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - kafka_network
+      - ecommerce-network
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - "9411:9411"
+    networks:
+      - ecommerce-network
   
   prometheus:
     image: prom/prometheus:latest
@@ -122,6 +127,8 @@ services:
       - "9090:9090"
     volumes:
       - ./docker-config/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - ecommerce-network
 
   grafana:
     image: grafana/grafana:latest
@@ -133,3 +140,81 @@ services:
       - ./docker-data-files/grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+    networks:
+      - ecommerce-network
+  
+  config-service:
+    image: ydj515/config-service:1.0
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.profiles.active: default
+    networks:
+      - ecommerce-network
+
+  discovery-service:
+    image: ydj515/discovery-service:1.0
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      spring.cloud.config.uri: config-service:8888
+      spring.profiles.active: default
+    networks:
+      - ecommerce-network
+
+  api-gateway-service:
+    image: ydj515/api-gateway-service:1.0
+    container_name: api-gateway-service
+    ports:
+      - "8000:8000"
+    environment:
+      spring.cloud.config.uri: config-service:8888
+      spring.rabbitmq.host: rabbitmq
+      eureka.client.serviceUrl.defaultZone: discovery-service:8761/eureka/
+    networks:
+      - ecommerce-network
+
+  user-service:
+    image: ydj515/user-service:1.0
+    container_name: user-service
+    environment:
+      spring.cloud.config.uri: config-service:8888
+      spring.rabbitmq.host: rabbitmq
+      spring.zipkin.base-url: zipkin:9411
+      eureka.client.serviceUrl.defaultZone: discovery-service:8761/eureka/
+      logging.file: /api-logs/users-ws.log
+    networks:
+      - ecommerce-network
+
+  order-service:
+    image: ydj515/order-service:1.0
+    container_name: order-service
+    environment:
+      spring.cloud.config.uri: config-service:8888
+      spring.rabbitmq.host: rabbitmq
+      spring.zipkin.base-url: zipkin:9411
+      eureka.client.serviceUrl.defaultZone: discovery-service:8761/eureka/
+      logging.file: /api-logs/orders-ws.log
+    networks:
+      - ecommerce-network
+
+  catalog-service:
+    image: ydj515/catalog-service:1.0
+    container_name: catalog-service
+    environment:
+      spring.cloud.config.uri: config-service:8888
+      eureka.client.serviceUrl.defaultZone: discovery-service:8761/eureka/
+      logging.file: /api-logs/catalogs-ws.log
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
